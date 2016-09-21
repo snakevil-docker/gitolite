@@ -1,0 +1,4 @@
+*
+!.gitignore
+
+!gitolite-*.tar.xz
