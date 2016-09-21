@@ -1,0 +1,3 @@
+[submodule "share/gitolite.git"]
+	path = share/gitolite.git
+	url = git://github.com/sitaramc/gitolite
