@@ -20,8 +20,12 @@ _GITOLITE_VERSION := $(shell \
 	echo $(TAG) | \
 		sed -e "s/^v//i" \
 )
+_DOCKER_INDEX := $(shell \
+	docker images | \
+		awk -v "tag=$(_GITOLITE_VERSION)" -f lib/docker-index.awk \
+)
 
-.DEFAULT_GOAL=gitolite
+.DEFAULT_GOAL=docker
 
 .PHONY: gitolite
 gitolite: var/lib/gitolite-$(_GITOLITE_VERSION).tar.xz
@@ -40,5 +44,10 @@ var/build/$(TAG)/VERSION: share/gitolite.git/install
 .PHONY: clean
 clean:
 	rm -fr var/build/*
+
+.PHONY: docker
+docker: gitolite
+	docker build --build-arg version=$(_GITOLITE_VERSION) -t gitolite:$(_GITOLITE_VERSION)-$(_DOCKER_INDEX) .
+	[ "x$(TAG)" != "x$(_GITOLITE_TAG)" ] || docker tag gitolite:$(_GITOLITE_VERSION)-$(_DOCKER_INDEX) gitolite:latest
 
 # vi:noet
