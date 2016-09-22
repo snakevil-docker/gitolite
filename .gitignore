@@ -1,6 +1,7 @@
 *
 !.gitignore
 
+!lib/
 !var/
 !Makefile
 !src/

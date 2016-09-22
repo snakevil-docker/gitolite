@@ -3,6 +3,14 @@ TAG := $(shell \
 	git tag --sort=-v:refname | \
 		head -n1 \
 )
+_GITOLITE_ILLEGAL := $(shell \
+	cd share/gitolite.git; \
+	git tag | \
+		awk -v "tag=$(TAG)" -f ../../lib/match-tag.awk \
+)
+$(if $(_GITOLITE_ILLEGAL), \
+	$(error $(TAG) not found) \
+)
 _GITOLITE_TAG := $(shell \
 	cd share/gitolite.git; \
 	git tag --sort=-v:refname | \
