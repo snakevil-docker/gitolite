@@ -3,12 +3,12 @@ TAG := $(shell \
 	git tag --sort=-v:refname | \
 		head -n1 \
 )
-.GITOLITE_TAG := $(shell \
+_GITOLITE_TAG := $(shell \
 	cd share/gitolite.git; \
 	git tag --sort=-v:refname | \
 		head -n1 \
 )
-.GITOLITE_VERSION := $(shell \
+_GITOLITE_VERSION := $(shell \
 	echo $(TAG) | \
 		sed -e "s/^v//i" \
 )
@@ -16,17 +16,18 @@ TAG := $(shell \
 .DEFAULT_GOAL=gitolite
 
 .PHONY: gitolite
-gitolite: var/lib/gitolite-$(.GITOLITE_VERSION).tar.xz
-	[ "x$(TAG)" != "x$(.GITOLITE_TAG)" ] || { \
+gitolite: var/lib/gitolite-$(_GITOLITE_VERSION).tar.xz
+	[ "x$(TAG)" != "x$(_GITOLITE_TAG)" ] || { \
 		rm -f var/lib/gitolite-latest.tar.xz; \
-		ln -s gitolite-$(.GITOLITE_VERSION).tar.xz var/lib/gitolite-latest.tar.xz; \
+		ln -s gitolite-$(_GITOLITE_VERSION).tar.xz var/lib/gitolite-latest.tar.xz; \
 	}
-var/lib/gitolite-$(.GITOLITE_VERSION).tar.xz: var/build/VERSION
+var/lib/gitolite-$(_GITOLITE_VERSION).tar.xz: var/build/$(TAG)/VERSION
 	tar -cf - --exclude=.git* -C $(<D) . | xz -9 > $@
-var/build/VERSION: share/gitolite.git/install
-	cd $(<D); git checkout $(TAG) 2> /dev/null
-	$< -to $(PWD)/$(@D)
-	cd $(<D); git checkout master > /dev/null 2>&1
+var/build/$(TAG)/VERSION: share/gitolite.git/install
+	[ -f "$@" ] || mkdir $(@D)
+	[ -f "$@" ] || { cd share/gitolite.git; git checkout $(TAG) 2> /dev/null; }
+	[ -f "$@" ] || share/gitolite.git/install -to $(PWD)/$(@D)
+	[ -f "$@" ] || { cd share/gitolite.git; git checkout master 2> /dev/null; }
 
 .PHONY: clean
 clean:
