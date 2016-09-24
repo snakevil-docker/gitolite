@@ -55,3 +55,13 @@ docker run -it --rm snakevil/gitolite /bin/sh
 ### 4. 简要运行日志
 
 实例启动后，会在 `/var/git` 的本地卷中创建名为 `docker.log` 的日志文件。
+
+### 5. 实例 root 帐号私钥文件自动备份
+
+该文件会在新实例初始化完成时复制到 `/var/git` 的本地卷中保存，文件名为 `docker.key` 。
+
+注意：`/var/git/projects.list` 文件会作为是否为新实例的标志特征，其不存在时会重新执行初始化逻辑。
+
+### 6. 实例 root 帐号私钥自动还原
+
+如 `/var/git/docker.key` 存在，那么实例会将其作为正确的私钥文件使用，以保障镜像地平滑更新不会影响到服务的稳定性。
