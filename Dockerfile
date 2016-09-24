@@ -5,7 +5,16 @@ MAINTAINER Snakevil Zen <zsnakevil@gmail.com>
 
 ARG version=latest
 
-RUN sed -i -e "s/dl-cdn.alpinelinux.org/mirrors.aliyun.com/" /etc/apk/repositories && \
+EXPOSE 22
+VOLUME /var/git
+ENTRYPOINT /srv/up
+
+ADD var/lib/gitolite-${version}.tar.xz src/srv/up /srv/
+ADD src/etc/localtime /etc/
+RUN chown -R root:root /srv && \
+    adduser -h /var/git -s /bin/sh -G users -S -D git && \
+    passwd -u git && \
+    sed -i -e "s/dl-cdn.alpinelinux.org/mirrors.aliyun.com/" /etc/apk/repositories && \
     apk add --no-cache openssh git perl && \
     sed -i -e "1iAllowUsers git" \
         -e "1iAuthenticationMethods publickey" \
@@ -23,15 +32,6 @@ RUN sed -i -e "s/dl-cdn.alpinelinux.org/mirrors.aliyun.com/" /etc/apk/repositori
     echo "  RequestTTY no" >> /root/.ssh/config && \
     echo "  StrictHostKeyChecking no" >> /root/.ssh/config && \
     git config --global user.name root && \
-    git config --global user.email root@gitolite && \
-    adduser -h /var/git -s /bin/sh -G users -S -D git && \
-    passwd -u git
-ADD var/lib/gitolite-${version}.tar.xz src/srv/up /srv/
-ADD src/etc/localtime /etc/
-RUN chown -R root:root /srv
-
-EXPOSE 22
-VOLUME /var/git
-ENTRYPOINT /srv/up
+    git config --global user.email root@gitolite
 
 # vi:sw=4:tw=120:
