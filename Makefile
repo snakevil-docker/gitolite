@@ -20,7 +20,7 @@ _GITOLITE_VERSION := $(shell \
 	echo $(TAG) | \
 		sed -e "s/^v//i" \
 )
-_DOCKER_INDEX := $(shell \
+INDEX := $(shell \
 	docker images | \
 		awk -v "tag=$(_GITOLITE_VERSION)" -f lib/docker-index.awk \
 )
@@ -47,7 +47,7 @@ clean:
 
 .PHONY: docker
 docker: gitolite
-	docker build --build-arg version=$(_GITOLITE_VERSION) -t gitolite:$(_GITOLITE_VERSION)-$(_DOCKER_INDEX) .
-	[ "x$(TAG)" != "x$(_GITOLITE_TAG)" ] || docker tag gitolite:$(_GITOLITE_VERSION)-$(_DOCKER_INDEX) gitolite:latest
+	docker build --build-arg version=$(_GITOLITE_VERSION) -t gitolite:$(_GITOLITE_VERSION)-$(INDEX) .
+	[ "x$(TAG)" != "x$(_GITOLITE_TAG)" ] || docker tag gitolite:$(_GITOLITE_VERSION)-$(INDEX) gitolite:latest
 
 # vi:noet
