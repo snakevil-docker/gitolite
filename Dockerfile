@@ -12,7 +12,7 @@ ENTRYPOINT /srv/up
 ADD var/lib/gitolite-${version}.tar.xz src/srv/up /srv/
 ADD src/etc/localtime /etc/
 RUN chown -R root:root /srv && \
-    adduser -h /var/git -s /bin/sh -G users -S -D git && \
+    adduser -h /var/git -s /bin/sh -G ping -S -D -u 999 git && \
     passwd -u git && \
     sed -i -e "s/dl-cdn.alpinelinux.org/mirrors.aliyun.com/" /etc/apk/repositories && \
     apk add --no-cache openssh git perl && \
