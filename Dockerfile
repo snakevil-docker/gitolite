@@ -7,7 +7,7 @@ ARG version=latest
 
 EXPOSE 22
 VOLUME /var/git
-ENTRYPOINT /srv/up
+ENTRYPOINT [ "/srv/up" ]
 
 ADD var/lib/gitolite-${version}.tar.xz src/srv/up /srv/
 ADD src/etc/localtime /etc/
