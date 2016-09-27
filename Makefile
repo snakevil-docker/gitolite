@@ -20,10 +20,6 @@ _GITOLITE_VERSION := $(shell \
 	echo $(TAG) | \
 		sed -e "s/^v//i" \
 )
-INDEX := $(shell \
-	docker images | \
-		awk -v "tag=$(_GITOLITE_VERSION)" -f lib/docker-index.awk \
-)
 
 .DEFAULT_GOAL=docker
 
@@ -33,13 +29,13 @@ gitolite: var/lib/gitolite-$(_GITOLITE_VERSION).tar.xz
 		rm -f var/lib/gitolite-latest.tar.xz; \
 		ln -s gitolite-$(_GITOLITE_VERSION).tar.xz var/lib/gitolite-latest.tar.xz; \
 	}
-var/lib/gitolite-$(_GITOLITE_VERSION).tar.xz: var/build/$(TAG)/VERSION
-	tar -cf - --exclude=.git* -C $(<D) . | xz -9 > $@
-var/build/$(TAG)/VERSION: share/gitolite.git/install
-	[ -f "$@" ] || mkdir $(@D)
+var/lib/gitolite-$(_GITOLITE_VERSION).tar.xz: var/build/$(TAG)/gitolite/VERSION
+	tar -cf - --exclude=.git* -C $(dir $(<D)) . | xz -9 > $@
+var/build/$(TAG)/gitolite/VERSION: share/gitolite.git/install
+	[ -f "$@" ] || mkdir -p $(@D)
 	[ -f "$@" ] || { cd share/gitolite.git; git checkout $(TAG) 2> /dev/null; }
 	[ -f "$@" ] || share/gitolite.git/install -to $(PWD)/$(@D)
-	[ -f "$@" ] || { cd share/gitolite.git; git checkout master 2> /dev/null; }
+	cd share/gitolite.git; git checkout master 2> /dev/null
 
 .PHONY: clean
 clean:
@@ -47,7 +43,7 @@ clean:
 
 .PHONY: docker
 docker: gitolite
-	docker build --build-arg version=$(_GITOLITE_VERSION) -t gitolite:$(_GITOLITE_VERSION)-$(INDEX) .
-	[ "x$(TAG)" != "x$(_GITOLITE_TAG)" ] || docker tag gitolite:$(_GITOLITE_VERSION)-$(INDEX) gitolite:latest
+	docker build --build-arg version=$(_GITOLITE_VERSION) -t gitolite:$(_GITOLITE_VERSION) .
+	[ "x$(TAG)" != "x$(_GITOLITE_TAG)" ] || docker tag gitolite:$(_GITOLITE_VERSION) gitolite:latest
 
 # vi:noet
