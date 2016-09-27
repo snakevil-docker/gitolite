@@ -9,11 +9,11 @@ EXPOSE 22
 VOLUME /var/git
 ENTRYPOINT [ "/srv/up" ]
 
+ADD include/etc/localtime /etc/
 RUN BUILD_DATE=20160924 && \
     sed -i -e "s/dl-cdn.alpinelinux.org/mirrors.aliyun.com/" /etc/apk/repositories && \
     apk add --no-cache openssh git perl
 ADD var/lib/gitolite-${version}.tar.xz src/srv/up /srv/
-ADD src/etc/localtime /etc/
 RUN chown -R root:root /srv /etc/localtime && \
     sed -i -e "1iAllowUsers git" \
         -e "1iAuthenticationMethods publickey" \
