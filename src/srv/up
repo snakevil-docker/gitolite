@@ -5,7 +5,7 @@ _log() {
 }
 
 [ 0 -lt $# ] || {
-  su - git -c "test -O /var/git" || chown -R git:ping /var/git
+  su - git -c "test -O /var/git" || chown -R git:docker /var/git
   cd /var/git
 
   [ -f "projects.list" ] && {

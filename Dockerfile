@@ -32,7 +32,8 @@ RUN chown -R root:root /srv /etc/localtime && \
     echo "  StrictHostKeyChecking no" >> /root/.ssh/config && \
     git config --global user.name root && \
     git config --global user.email root@gitolite && \
-    adduser -h /var/git -s /bin/sh -G ping -S -D -u 999 git && \
+    addgroup -S docker && \
+    adduser -h /var/git -s /bin/sh -G docker -S -D git && \
     passwd -u git
 
 # vi:sw=4:tw=120:
