@@ -1,65 +1,11 @@
 #!/bin/sh -e
 
-_log() {
-  echo `date +"%Y-%m-%d %H:%I:%S"`"$@" >> /var/git/docker.log
-}
-
 [ 0 -lt $# ] || {
-  su - git -c "test -O /var/git" || chown -R git:docker /var/git
-  cd /var/git
-
-  [ -f "projects.list" ] && {
-    [ ! -f docker.key ] || cp -f docker.key /root/.ssh/id_rsa
-  } || {
-    cp -f /root/.ssh/id_rsa.pub root.pub
-    cp -f /root/.ssh/id_rsa docker.key
-    su - git -c "/srv/gitolite/gitolite setup -pk root.pub -m 'initialized.'"
-    _log " initialized."
-  }
-
-  rm -f root.pub
-
-  ls *.pub > /dev/null 2>&1 && {
-    /usr/sbin/sshd -4
-    TMP="/tmp/gitolite-admin.$RANDOM"
-    LST=
-    ADM=
-    CNT=
-    git clone git@localhost:gitolite-admin "$TMP"
-    for ii in *.pub; do
-      PUB=$ii
-      PWR=
-      [ "@" != ${PUB:0:1} ] || {
-        PUB=${PUB:1}
-        PWR=1
-      }
-      USR=`basename "$PUB" .pub`
-      [ -f "$TMP/keydir/$PUB" ] || {
-        mv "$ii" "$TMP/keydir/$PUB"
-        CNT="1$CNT"
-        LST="$LST, $USR"
-        [ -z "$PWR" ] || ADM="$ADM $USR"
-      }
-    done
-    [ -z "$CNT" ] || {
-      [ -z "$ADM" ] || {
-        sed -i -e "/RW+     =   root/s/RW+     =   root/&$ADM/" "$TMP/conf/gitolite.conf"
-        _log "$ADM rooted."
-      }
-      LST=${LST:1}
-      _log "$LST added."
-      [ "x1" == "x$CNT" ] || LST="s:$LST"
-      cd "$TMP"
-      git add .
-      git commit -m "(auto) added user${LST}."
-      git push
-      cd /var/git
-    }
-    rm -fr "$TMP" *.pub
-    killall sshd
-  }
-
-  _log " opened."
+  for ii in /srv/up.d/*; do
+    sh -e "$ii" 3>> /var/git/docker.log
+    RCD=$?
+    [ 0 -eq $RCD ] || exit $RCD
+  done
   set -- /usr/sbin/sshd -4D
 }
 

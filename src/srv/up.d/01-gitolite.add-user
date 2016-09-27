@@ -1,0 +1,49 @@
+#!/bin/sh -e
+
+_echo() {
+  echo `date +"%Y-%m-%d %H:%I:%S"`"$@" >&3
+}
+
+cd /var/git
+
+ls *.pub > /dev/null 2>&1 && {
+  /usr/sbin/sshd -4
+  TMP="/tmp/gitolite-admin.$RANDOM"
+  LST=
+  ADM=
+  CNT=
+  git clone git@localhost:gitolite-admin "$TMP"
+  for ii in *.pub; do
+    PUB=$ii
+    PWR=
+    [ "@" != ${PUB:0:1} ] || {
+      PUB=${PUB:1}
+      PWR=1
+    }
+    USR=`basename "$PUB" .pub`
+    [ -f "$TMP/keydir/$PUB" ] || {
+      mv "$ii" "$TMP/keydir/$PUB"
+      CNT="1$CNT"
+      LST="$LST, $USR"
+      [ -z "$PWR" ] || ADM="$ADM $USR"
+    }
+  done
+  [ -z "$CNT" ] || {
+    [ -z "$ADM" ] || {
+      sed -i -e "/RW+     =   root/s/RW+     =   root/&$ADM/" "$TMP/conf/gitolite.conf"
+      _echo "$ADM rooted."
+    }
+    LST=${LST:1}
+    _echo "$LST added."
+    [ "x1" == "x$CNT" ] || LST="s:$LST"
+    cd "$TMP"
+    git add .
+    git commit -m "(auto) added user${LST}."
+    git push
+    cd /var/git
+  }
+  rm -fr "$TMP" *.pub
+  killall sshd
+} || exit 0
+
+# vi:ft=sh:sw=2
