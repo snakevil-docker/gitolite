@@ -1,0 +1,5 @@
+#!/bin/sh -e
+
+echo "[services.d] starting service: sshd"
+
+/usr/sbin/sshd -4D

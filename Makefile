@@ -29,9 +29,10 @@ gitolite: var/lib/gitolite-$(_GITOLITE_VERSION).tar.xz
 		rm -f var/lib/gitolite-latest.tar.xz; \
 		ln -s gitolite-$(_GITOLITE_VERSION).tar.xz var/lib/gitolite-latest.tar.xz; \
 	}
-var/lib/gitolite-$(_GITOLITE_VERSION).tar.xz: var/build/$(TAG)/gitolite/VERSION
-	tar -cf - --exclude=.git* -C $(dir $(<D)) . | xz -9 > $@
-var/build/$(TAG)/gitolite/VERSION: share/gitolite.git/install
+var/lib/gitolite-$(_GITOLITE_VERSION).tar.xz: var/build/$(TAG)/srv/gitolite/VERSION
+	find $(dir $(<D)).. -type f -name '.*' -delete
+	tar -cf - -C $(dir $(<D)).. . | xz -9 > $@
+var/build/$(TAG)/srv/gitolite/VERSION: share/gitolite.git/install
 	[ -f "$@" ] || mkdir -p $(@D)
 	[ -f "$@" ] || { cd share/gitolite.git; git checkout $(TAG) 2> /dev/null; }
 	[ -f "$@" ] || share/gitolite.git/install -to $(PWD)/$(@D)

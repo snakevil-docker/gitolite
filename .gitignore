@@ -2,9 +2,8 @@
 !.gitignore
 
 !lib/
+!share/
 !var/
 !Makefile
-!src/
-!include/
 !Dockerfile
 !README.md

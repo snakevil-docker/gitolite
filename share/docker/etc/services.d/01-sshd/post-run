@@ -1,10 +1,8 @@
 #!/bin/sh -e
 
-_echo() {
-  echo `date +"%Y-%m-%d %H:%I:%S"`"$@" >&3
-}
+exit 0
 
-cd /var/git
+cd /mnt/git
 
 ls *.pub > /dev/null 2>&1 && {
   /usr/sbin/sshd -4
