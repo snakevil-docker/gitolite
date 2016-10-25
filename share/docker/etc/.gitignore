@@ -3,3 +3,4 @@
 
 !cont-init.d/
 !services.d/
+!fix-attrs.d/

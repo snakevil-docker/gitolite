@@ -1,13 +1,12 @@
 #!/bin/sh -e
 
-DIR=/mnt/git
-
-chown -R git:nobody "$DIR"
-
-cd "$DIR"
+cd /mnt/git
 
 [ -f "projects.list" ] && {
-  [ ! -f docker.key ] || cp -f docker.key /root/.ssh/id_rsa
+  [ ! -f docker.key ] || {
+    cp -f docker.key /root/.ssh/id_rsa
+    chown root:root /root/.ssh/id_rsa
+  }
 } || {
   cp -f /root/.ssh/id_rsa.pub root.pub
   cp -f /root/.ssh/id_rsa docker.key
