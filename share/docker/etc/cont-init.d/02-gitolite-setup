@@ -5,7 +5,8 @@ cd /mnt/git
 [ -f "projects.list" ] && {
   [ ! -f docker.key ] || {
     cp -f docker.key /root/.ssh/id_rsa
-    chown root:root /root/.ssh/id_rsa
+    chmod 0600 /root/.ssh/id_rsa
+    rm -f /root/.ssh/id_rsa.pub
   }
 } || {
   cp -f /root/.ssh/id_rsa.pub root.pub
