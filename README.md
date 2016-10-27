@@ -18,6 +18,10 @@ VOLUME
 
     版本库目录的挂载卷。
 
+* `/mnt/_`
+
+    实现自 [snakevil/base](https://github.com/snakevil-docker/base#volume)。
+
 导入资源
 ---
 

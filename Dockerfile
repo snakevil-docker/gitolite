@@ -1,14 +1,12 @@
 FROM registry.cn-hangzhou.aliyuncs.com/snakevil/base
 MAINTAINER Snakevil Zen <zsnakevil@gmail.com>
 
-ARG version=latest
-
 EXPOSE 22
 VOLUME /mnt/git
 
-RUN BUILD_DATE=20161021 \
+RUN BUILD_DATE=20161027 \
  && apk add --no-cache openssh git perl
-ADD share/docker/ var/lib/gitolite-${version}.tar.xz /
+ADD share/docker/ var/lib/gitolite-latest.tar.xz /
 
 RUN chown -R root:root /srv \
  && sed -i -e "1iAllowUsers git" \
